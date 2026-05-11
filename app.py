@@ -215,10 +215,7 @@ TIMEFRAME_MAP = {
 PLOTLY_TEMPLATE = dict(
     plot_bgcolor="#080c14",
     paper_bgcolor="#080c14",
-    font_color="#94a3b8",
-    font_family="JetBrains Mono",
-    gridcolor="#131c2b",
-    zerolinecolor="#1e2d40",
+    font=dict(color="#94a3b8", family="JetBrains Mono"),
 )
 
 
