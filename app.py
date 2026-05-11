@@ -251,15 +251,19 @@ def fetch_snapshot(tickers: list) -> pd.DataFrame:
             info = t.fast_info
             hist = yf.download(ticker, period="5d", interval="1d", progress=False, auto_adjust=True)
 
+            # Normalize Close/Volume columns — yfinance may return MultiIndex DataFrame
+            close_col = hist["Close"].squeeze() if not hist.empty else pd.Series(dtype=float)
+            vol_col   = hist["Volume"].squeeze() if not hist.empty else pd.Series(dtype=float)
+
             # Current price
             try:
                 current_price = float(info.last_price)
             except Exception:
-                current_price = float(hist["Close"].iloc[-1]) if not hist.empty else np.nan
+                current_price = float(close_col.iloc[-1]) if not close_col.empty else np.nan
 
             # Daily return
-            if not hist.empty and len(hist) >= 2:
-                prev_close = float(hist["Close"].iloc[-2])
+            if len(close_col) >= 2:
+                prev_close = float(close_col.iloc[-2])
                 daily_return = (current_price - prev_close) / prev_close * 100
             else:
                 daily_return = np.nan
@@ -267,11 +271,11 @@ def fetch_snapshot(tickers: list) -> pd.DataFrame:
             # Market cap (shares * price, fallback to reported market cap)
             try:
                 shares = info.shares
-                market_cap = shares * current_price if shares and not np.isnan(shares) else np.nan
+                market_cap = float(shares) * current_price if shares and not np.isnan(float(shares)) else np.nan
             except Exception:
                 market_cap = np.nan
 
-            if np.isnan(market_cap):
+            if pd.isna(market_cap):
                 try:
                     full_info = t.info
                     market_cap = full_info.get("marketCap", np.nan)
@@ -279,11 +283,11 @@ def fetch_snapshot(tickers: list) -> pd.DataFrame:
                     market_cap = np.nan
 
             # Volume stats (20-day z-score)
-            volume = float(hist["Volume"].iloc[-1]) if not hist.empty else np.nan
-            vol_20d = hist["Volume"].tail(21).iloc[:-1] if len(hist) >= 21 else hist["Volume"]
+            volume = float(vol_col.iloc[-1]) if not vol_col.empty else np.nan
+            vol_20d = vol_col.tail(21).iloc[:-1] if len(vol_col) >= 21 else vol_col
             vol_mean = float(vol_20d.mean()) if not vol_20d.empty else np.nan
-            vol_std = float(vol_20d.std()) if not vol_20d.empty else np.nan
-            z_score = (volume - vol_mean) / vol_std if vol_std and vol_std > 0 else 0.0
+            vol_std  = float(vol_20d.std())  if not vol_20d.empty else np.nan
+            z_score  = (volume - vol_mean) / vol_std if vol_std and vol_std > 0 else 0.0
 
             rows.append({
                 "ticker": ticker,
@@ -400,11 +404,7 @@ def build_treemap(snapshot: pd.DataFrame) -> go.Figure:
             cmid=0,
             cmin=-3,
             cmax=3,
-            colorbar=dict(
-                title="Retorno %",
-                tickfont=dict(size=10, color="#94a3b8"),
-                titlefont=dict(size=11, color="#94a3b8"),
-            ),
+
         ),
         hovertemplate="<b>%{label}</b><br>Market Cap: $%{value:,.0f}<br>%{customdata}<extra></extra>",
     ))
