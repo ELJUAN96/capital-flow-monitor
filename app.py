@@ -212,12 +212,6 @@ TIMEFRAME_MAP = {
     "3M": ("3mo", "1d"),
 }
 
-PLOTLY_TEMPLATE = dict(
-    plot_bgcolor="#080c14",
-    paper_bgcolor="#080c14",
-    font=dict(color="#94a3b8", family="JetBrains Mono"),
-)
-
 
 # ─── DATA LAYER ─────────────────────────────────────────────────────────────────
 @st.cache_data(ttl=300, show_spinner=False)
@@ -406,10 +400,11 @@ def build_treemap(snapshot: pd.DataFrame) -> go.Figure:
         hovertemplate="<b>%{label}</b><br>Market Cap: $%{value:,.0f}<br>%{customdata}<extra></extra>",
     ))
     fig.update_layout(
-        **PLOTLY_TEMPLATE,
+        plot_bgcolor="#080c14",
+        paper_bgcolor="#080c14",
+        font=dict(color="#94a3b8", family="JetBrains Mono"),
         height=460,
         margin=dict(t=10, l=5, r=5, b=5),
-        title=dict(text="", font=dict(size=0)),
     )
     return fig
 
@@ -442,7 +437,9 @@ def build_relative_strength(rs_df: pd.DataFrame, selected_tickers: list = None) 
     fig.add_hline(y=100, line_dash="dash", line_color="#1e2d40", line_width=1)
 
     fig.update_layout(
-        **PLOTLY_TEMPLATE,
+        plot_bgcolor="#080c14",
+        paper_bgcolor="#080c14",
+        font=dict(color="#94a3b8", family="JetBrains Mono"),
         height=380,
         margin=dict(t=10, l=10, r=10, b=10),
         legend=dict(
@@ -505,7 +502,9 @@ def build_cross_ratio_chart(price_history: dict, pairs: list) -> go.Figure:
         )
 
     fig.update_layout(
-        **PLOTLY_TEMPLATE,
+        plot_bgcolor="#080c14",
+        paper_bgcolor="#080c14",
+        font=dict(color="#94a3b8", family="JetBrains Mono"),
         height=80 + 140 * n,
         margin=dict(t=30, l=10, r=10, b=10),
         showlegend=False,
@@ -540,7 +539,9 @@ def build_ai_chain_chart(price_history: dict) -> go.Figure:
 
     fig.add_hline(y=100, line_dash="dot", line_color="#1e2d40", line_width=1)
     fig.update_layout(
-        **PLOTLY_TEMPLATE,
+        plot_bgcolor="#080c14",
+        paper_bgcolor="#080c14",
+        font=dict(color="#94a3b8", family="JetBrains Mono"),
         height=360,
         margin=dict(t=10, l=10, r=10, b=10),
         legend=dict(
@@ -582,7 +583,9 @@ def build_volume_zscore_bar(snapshot: pd.DataFrame) -> go.Figure:
     fig.add_vline(x=0, line_color="#1e2d40", line_width=1)
 
     fig.update_layout(
-        **PLOTLY_TEMPLATE,
+        plot_bgcolor="#080c14",
+        paper_bgcolor="#080c14",
+        font=dict(color="#94a3b8", family="JetBrains Mono"),
         height=380,
         margin=dict(t=10, l=10, r=40, b=10),
         xaxis=dict(title="Z-Score Volumen (20D)", showgrid=True, gridcolor="#131c2b"),
